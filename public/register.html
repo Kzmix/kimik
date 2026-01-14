@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/auth.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="auth-container">
+  <div class="auth-card">
+    <h1>Buat Akun</h1>
+    <p class="sub">Daftar untuk menyimpan bookmark & progress</p>
+
+    <form id="registerForm">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" name="username" required autocomplete="username">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" required minlength="6" autocomplete="new-password">
+      </div>
+
+      <div class="field">
+        <label>Konfirmasi Password</label>
+        <input type="password" name="confirm" required minlength="6" autocomplete="new-password">
+      </div>
+
+      <button type="submit" class="btn primary">Daftar</button>
+    </form>
+
+    <p class="switch">
+      Sudah punya akun?
+      <a href="/login.html">Login</a>
+    </p>
+  </div>
+</div>
+
+<script src="/js/register.js"></script>
+</body>
+</html>

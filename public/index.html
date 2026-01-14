@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comic Reader – Home</title>
+
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/home.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+
+<body>
+
+<section>
+  <div class="section-title">Trending Today</div>
+  <div class="slider" id="slider"></div>
+
+  <div class="section-title">Trending by Readers</div>
+  <div class="trending-list" id="trendingList"></div>
+
+  <div class="section-title">Newest Update</div>
+  <div id="newest"></div>
+</section>
+
+<nav class="footer">
+  <button class="active" onclick="location.href='index.html'">
+    <i class="ri-home-5-fill"></i>
+    <span>Home</span>
+  </button>
+
+  <button onclick="location.href='search.html'">
+    <i class="ri-search-line"></i>
+    <span>Search</span>
+  </button>
+
+  <button onclick="location.href='bookmark.html'">
+    <i class="ri-bookmark-3-line"></i>
+    <span>Bookmark</span>
+  </button>
+
+  <button onclick="location.href='profile.html'">
+    <i class="ri-user-3-line"></i>
+    <span>Profile</span>
+  </button>
+</nav>
+
+<script type="module" src="js/home.js"></script>
+</body>
+</html>

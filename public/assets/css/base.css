@@ -1,0 +1,45 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+}
+
+body{
+  background:radial-gradient(circle at top,#1b1b2f,#0b0b12);
+  color:#fff;
+  padding-bottom:90px;
+}
+
+.section-title{
+  font-size:18px;
+  font-weight:700;
+  margin:24px 16px 12px;
+}
+
+/* FOOTER */
+.footer{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  height:72px;
+  background:rgba(15,15,25,.9);
+  backdrop-filter:blur(12px);
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+}
+
+.footer button{
+  background:none;
+  border:none;
+  color:#aaa;
+  font-size:11px;
+}
+
+.footer i{
+  font-size:22px;
+  display:block;
+}
+
+.footer .active{color:#fff}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comic Detail</title>
+
+  <link rel="stylesheet" href="/assets/css/base.css">
+<link rel="stylesheet" href="/assets/css/comic.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button onclick="history.back()">
+    <i class="ri-arrow-left-line"></i>
+  </button>
+  <strong>Detail Komik</strong>
+</header>
+
+<!-- COVER -->
+<section class="cover-card">
+  <div class="cover-img">
+    <img id="coverImg" alt="Cover">
+  </div>
+  <div class="cover-info">
+    <h1 id="title"></h1>
+    <div class="genre" id="genre"></div>
+    <div class="synopsis" id="synopsis"></div>
+    <button id="bookmarkBtn" class="bookmark-btn">
+  <i class="ri-bookmark-line"></i>
+  <span>Bookmark</span>
+</button>
+  </div>
+</section>
+
+<!-- CHAPTER -->
+<h2 class="chapter-title">Chapter</h2>
+<div class="chapter-list" id="chapters"></div>
+
+<!-- FOOTER -->
+<nav class="footer">
+  <button onclick="location.href='/'">
+    <i class="ri-home-5-line"></i>Home
+  </button>
+  <button>
+    <i class="ri-search-line"></i>Search
+  </button>
+  <button onclick="location.href='/bookmark.html'">
+    <i class="ri-bookmark-line"></i>Bookmark
+  </button>
+  <button class="active">
+    <i class="ri-book-open-line"></i>Detail
+  </button>
+</nav>
+
+<!-- LOGIN REQUIRED MODAL -->
+<div class="modal-backdrop" id="loginModal">
+  <div class="modal-card">
+    <h3>Login Diperlukan</h3>
+    <p>Kamu harus login terlebih dahulu untuk menyimpan bookmark.</p>
+
+    <div class="modal-actions">
+      <button class="btn ghost" id="loginCancel">Batal</button>
+      <button class="btn primary" id="loginConfirm">Login</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/js/comic.js"></script>
+</body>
+</html>

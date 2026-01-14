@@ -1,0 +1,24 @@
+{
+  "sensei": {
+    "slug": "sensei",
+    "title": "Sensei! We will destroy the world.",
+    "genre": "Manga, Comedy, Drama, Fantasy",
+    "cover": "https://bato.si/media/ampi/022/0221537ebc3e027aa5358ded71d5593bfad51bcd_2812_4000_2987803.jpeg",
+    "synopsis": "Seorang guru misterius dan murid-muridnya berusaha menghancurkan dunia.",
+    "chapters": {
+      "1": {
+        "title": "Chapter 1",
+        "pages": 20,
+        "images": [
+          "https://raw.githubusercontent.com/Kzmix/sensei/refs/heads/main/ch-1/67631485_1920_1365_878040.webp",
+          "https://raw.githubusercontent.com/Kzmix/sensei/refs/heads/main/ch-1/67631497_1080_1536_295168.webp"
+        ]
+      },
+      "2": {
+        "title": "Chapter 2",
+        "pages": 18,
+        "images": []
+      }
+    }
+  }
+}
