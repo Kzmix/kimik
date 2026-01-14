@@ -1,20 +1,23 @@
+// public/js/login.js
 import { auth } from "./firebase.js";
-import { signInWithEmailAndPassword } from
-  "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const form = document.getElementById("loginForm");
 
 form.addEventListener("submit", async e => {
   e.preventDefault();
 
-  const fd = new FormData(form);
-  const username = fd.get("username");
-  const password = fd.get("password");
+  const username = form.username.value.trim();
+  const password = form.password.value;
 
   try {
+    const email = `${username}@kimik.app`;
+
     await signInWithEmailAndPassword(
       auth,
-      `${username}@comic.local`,
+      email,
       password
     );
 
@@ -22,8 +25,9 @@ form.addEventListener("submit", async e => {
     const redirect = params.get("redirect") || "/";
     location.href = redirect;
 
-  } catch {
-    showError("Username / password salah");
+  } catch (err) {
+    console.error(err);
+    showError("Username atau password salah");
   }
 });
 
@@ -32,8 +36,8 @@ function showError(msg){
   if (!el){
     el = document.createElement("div");
     el.className = "auth-error";
-    el.style.color = "#ff9a9a";
     el.style.marginTop = "12px";
+    el.style.color = "#ff9a9a";
     form.appendChild(el);
   }
   el.textContent = msg;
