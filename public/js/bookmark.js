@@ -1,34 +1,59 @@
 import { auth, db } from "./firebase.js";
-import {
-  collection, getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { onAuthStateChanged } from
   "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  collection,
+  getDocs
+} from
+  "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const list = document.getElementById("list");
 
+/* ================================
+   AUTH CHECK (SATU KALI SAJA)
+================================ */
 onAuthStateChanged(auth, async user => {
   if (!user){
     renderLoginGate();
     return;
   }
 
-  const comics = await fetch("/data/data.json").then(r=>r.json());
-  const snap = await getDocs(
-    collection(db, "bookmarks", user.uid, "items")
-  );
+  try {
+    const comics = await fetch("/data/data.json").then(r => r.json());
 
-  const saved = [];
-  snap.forEach(d => {
-    if (comics[d.id]) saved.push(comics[d.id]);
-  });
+    const snap = await getDocs(
+      collection(db, "bookmarks", user.uid, "items")
+    );
 
-  render(saved);
+    const saved = [];
+    snap.forEach(doc => {
+      if (comics[doc.id]) {
+        saved.push(comics[doc.id]);
+      }
+    });
+
+    render(saved);
+
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = `
+      <p style="padding:16px;color:#ff9a9a">
+        Gagal memuat bookmark
+      </p>
+    `;
+  }
 });
 
+/* ================================
+   RENDER BOOKMARK
+================================ */
 function render(arr){
   if (!arr.length){
-    list.innerHTML = `<p style="opacity:.6;padding:16px">Belum ada bookmark</p>`;
+    list.innerHTML = `
+      <p style="opacity:.6;padding:16px">
+        Belum ada bookmark ⭐
+      </p>
+    `;
     return;
   }
 
@@ -44,11 +69,25 @@ function render(arr){
   `).join("");
 }
 
+/* ================================
+   LOGIN GATE
+================================ */
 function renderLoginGate(){
   list.innerHTML = `
-    <div style="padding:30px;text-align:center">
+    <div style="padding:30px;text-align:center;opacity:.9">
       <h3>Login Diperlukan</h3>
-      <button onclick="location.href='/login.html'">
+      <p style="font-size:14px;opacity:.7;margin:8px 0 16px">
+        Bookmark hanya tersedia untuk user login
+      </p>
+      <button
+        onclick="location.href='/login.html?redirect=${encodeURIComponent(location.pathname)}'"
+        style="
+          padding:12px 20px;
+          border-radius:999px;
+          border:none;
+          background:#9aa4ff;
+          font-weight:600;
+        ">
         Login / Daftar
       </button>
     </div>
