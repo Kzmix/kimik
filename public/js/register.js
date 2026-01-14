@@ -1,35 +1,32 @@
+import { auth } from "./firebase.js";
+import { createUserWithEmailAndPassword } from
+  "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
 const form = document.getElementById("registerForm");
 
-form.addEventListener("submit", e => {
+form.addEventListener("submit", async e => {
   e.preventDefault();
 
-  const formData = new FormData(form);
-  const data = Object.fromEntries(formData.entries());
+  const fd = new FormData(form);
+  const username = fd.get("username");
+  const password = fd.get("password");
+  const confirm = fd.get("confirm");
 
-  if (data.password !== data.confirm) {
-    showError("Password dan konfirmasi tidak sama");
+  if (password !== confirm) {
+    showError("Password tidak sama");
     return;
   }
 
-  fetch("/api/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: data.username,
-      password: data.password
-    })
-  })
-  .then(res => {
-    if (!res.ok) throw new Error("Register gagal");
-    return res.json();
-  })
-  .then(() => {
-    // setelah register langsung ke login
+  try {
+    await createUserWithEmailAndPassword(
+      auth,
+      `${username}@comic.local`,
+      password
+    );
     location.href = "/login.html";
-  })
-  .catch(() => {
-    showError("Username sudah digunakan atau data tidak valid");
-  });
+  } catch (err) {
+    showError("Username sudah digunakan");
+  }
 });
 
 function showError(msg){
@@ -37,9 +34,8 @@ function showError(msg){
   if (!el){
     el = document.createElement("div");
     el.className = "auth-error";
-    el.style.marginTop = "12px";
-    el.style.fontSize = "13px";
     el.style.color = "#ff9a9a";
+    el.style.marginTop = "12px";
     form.appendChild(el);
   }
   el.textContent = msg;

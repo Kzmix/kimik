@@ -1,111 +1,54 @@
-let comics = {};
+import { auth, db } from "./firebase.js";
+import {
+  collection, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { onAuthStateChanged } from
+  "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const list = document.getElementById("list");
 
-/* ================================
-   FETCH BOOKMARKS + COMICS
-================================ */
-Promise.all([
-  fetch("/api/bookmarks", { credentials: "include" }),
-  fetch("/data/data.json")
-])
-.then(async ([bmRes, comicRes]) => {
-  if (bmRes.status === 401) {
-    throw new Error("LOGIN_REQUIRED");
-  }
-
-  const bookmarks = await bmRes.json();
-  comics = await comicRes.json();
-
-  renderBookmarks(bookmarks);
-})
-.catch(err => {
-  if (err.message === "LOGIN_REQUIRED") {
+onAuthStateChanged(auth, async user => {
+  if (!user){
     renderLoginGate();
-  } else {
-    console.error(err);
-    list.innerHTML = `
-      <p style="padding:16px;color:#ffb4b4">
-        Gagal memuat bookmark
-      </p>
-    `;
-  }
-});
-
-/* ================================
-   RENDER BOOKMARKS
-================================ */
-function renderBookmarks(bookmarks){
-  let saved = bookmarks
-    .map(slug => comics[slug])
-    .filter(Boolean)
-    .map(c => {
-      const chapters = Object.keys(c.chapters || {})
-        .map(k => Number(k))
-        .filter(n => !isNaN(n))
-        .sort((a,b)=>b-a);
-
-      return {
-        ...c,
-        latestChapter: chapters[0] || 0
-      };
-    });
-
-  // sort by update terbaru
-  saved.sort((a,b)=>b.latestChapter - a.latestChapter);
-
-  if (!saved.length){
-    list.innerHTML = `
-      <p style="padding:16px;opacity:.6">
-        Belum ada bookmark ⭐
-      </p>
-    `;
     return;
   }
 
-  list.innerHTML = saved.map(c => `
+  const comics = await fetch("/data/data.json").then(r=>r.json());
+  const snap = await getDocs(
+    collection(db, "bookmarks", user.uid, "items")
+  );
+
+  const saved = [];
+  snap.forEach(d => {
+    if (comics[d.id]) saved.push(comics[d.id]);
+  });
+
+  render(saved);
+});
+
+function render(arr){
+  if (!arr.length){
+    list.innerHTML = `<p style="opacity:.6;padding:16px">Belum ada bookmark</p>`;
+    return;
+  }
+
+  list.innerHTML = arr.map(c => `
     <div class="bookmark-item"
-         onclick="location.href='/comic/${c.slug}'">
-
-      <div class="bookmark-cover">
-        <img src="${c.cover}" alt="${c.title}">
-      </div>
-
-      <div class="bookmark-info">
-        <div>
-          <div class="bookmark-title">${c.title}</div>
-          <div class="bookmark-genre">${c.genre}</div>
-          <span class="badge-update">
-            Chapter ${c.latestChapter}
-          </span>
-        </div>
+      onclick="location.href='/comic/${c.slug}'">
+      <img src="${c.cover}">
+      <div>
+        <div class="title">${c.title}</div>
+        <div class="genre">${c.genre}</div>
       </div>
     </div>
   `).join("");
 }
 
-/* ================================
-   LOGIN GATE
-================================ */
 function renderLoginGate(){
   list.innerHTML = `
-    <div style="padding:28px;text-align:center;opacity:.9">
-      <i class="ri-lock-2-line" style="font-size:44px;opacity:.6"></i>
-      <h3 style="margin-top:12px">Login Diperlukan</h3>
-      <p style="margin:10px 0 18px;font-size:14px;opacity:.75">
-        Bookmark hanya tersedia untuk user yang sudah login
-      </p>
-      <button
-        onclick="location.href='/login.html?redirect=${encodeURIComponent(location.pathname)}'"
-        style="
-          padding:12px 22px;
-          border-radius:999px;
-          border:none;
-          background:#9aa4ff;
-          color:#000;
-          font-weight:600;
-          font-size:14px;
-        ">
+    <div style="padding:30px;text-align:center">
+      <h3>Login Diperlukan</h3>
+      <button onclick="location.href='/login.html'">
         Login / Daftar
       </button>
     </div>
