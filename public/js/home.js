@@ -1,21 +1,26 @@
 let comics = [];
 
-fetch("/data/data.json")
-  .then(res => res.json())
-  .then(data => {
-    comics = Object.values(data);
-    render();
-  });
-
 const slider = document.getElementById("slider");
 const trendingList = document.getElementById("trendingList");
 const newest = document.getElementById("newest");
 
 /* ================================
-   NAV
+   LOAD DATA
+================================ */
+fetch("/data/data.json")
+  .then(res => res.json())
+  .then(data => {
+    comics = Object.values(data);
+    render();
+  })
+  .catch(err => {
+    console.error("Gagal load data:", err);
+  });
+
+/* ================================
+   NAV (HOME → COMIC DETAIL)
 ================================ */
 function openComic(slug){
-  console.log("OPEN COMIC:", slug);
   location.href = `/comic/${slug}`;
 }
 
@@ -39,7 +44,7 @@ function card(c, small=false){
 function list(c){
   return `
     <div class="list-card" data-open="${c.slug}">
-      <img src="${c.cover}">
+      <img src="${c.cover}" alt="${c.title}">
       <div>
         <div class="title">${c.title}</div>
         <div class="genre">${c.genre}</div>
@@ -49,7 +54,7 @@ function list(c){
 }
 
 /* ================================
-   EVENT BINDING (SATU TEMPAT)
+   EVENT BINDING
 ================================ */
 function bindOpen(){
   document.querySelectorAll("[data-open]").forEach(el => {

@@ -1,35 +1,47 @@
+// public/js/register.js
+import { auth, db } from "./firebase.js";
+import {
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  doc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 const form = document.getElementById("registerForm");
 
-form.addEventListener("submit", e => {
+form.addEventListener("submit", async e => {
   e.preventDefault();
 
-  const formData = new FormData(form);
-  const data = Object.fromEntries(formData.entries());
+  const username = form.username.value.trim();
+  const password = form.password.value;
+  const confirm = form.confirm.value;
 
-  if (data.password !== data.confirm) {
-    showError("Password dan konfirmasi tidak sama");
+  if (password !== confirm) {
+    showError("Password tidak sama");
     return;
   }
 
-  fetch("/api/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: data.username,
-      password: data.password
-    })
-  })
-  .then(res => {
-    if (!res.ok) throw new Error("Register gagal");
-    return res.json();
-  })
-  .then(() => {
-    // setelah register langsung ke login
+  try {
+    // Firebase Auth butuh email → kita palsuin
+    const email = `${username}@kimik.app`;
+
+    const cred = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    // Simpan username ke Firestore
+    await setDoc(doc(db, "users", cred.user.uid), {
+      username,
+      createdAt: Date.now()
+    });
+
     location.href = "/login.html";
-  })
-  .catch(() => {
-    showError("Username sudah digunakan atau data tidak valid");
-  });
+  } catch (err) {
+    console.error(err);
+    showError("Username sudah digunakan");
+  }
 });
 
 function showError(msg){
@@ -38,7 +50,6 @@ function showError(msg){
     el = document.createElement("div");
     el.className = "auth-error";
     el.style.marginTop = "12px";
-    el.style.fontSize = "13px";
     el.style.color = "#ff9a9a";
     form.appendChild(el);
   }
