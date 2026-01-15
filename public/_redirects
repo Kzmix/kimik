@@ -1,3 +1,4 @@
+/comic/*/    /comic.html    200
 /comic/*/*   /reader.html   200
 /comic/*     /comic.html    200
 
