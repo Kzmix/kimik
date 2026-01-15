@@ -20,7 +20,7 @@ const bookmarkBtn = document.getElementById("bookmarkBtn");
 /* ================================
    LOAD COMIC
 ================================ */
-fetch("/data/data.json")
+fetch(`${location.origin}/data/data.json`)
   .then(r => r.json())
   .then(data => {
     const comic = data[slug];

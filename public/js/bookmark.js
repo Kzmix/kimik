@@ -1,8 +1,8 @@
-<<<<<<< HEAD
+
 import { API_BASE } from "./api.js";
 
 let comics = {};
-=======
+
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged } from
   "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -11,14 +11,14 @@ import {
   getDocs
 } from
   "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
->>>>>>> 4cf1a47f18f39b8b55676084a411c557a242619f
+
 
 const list = document.getElementById("list");
 
 /* ================================
    AUTH CHECK (SATU KALI SAJA)
 ================================ */
-<<<<<<< HEAD
+
 Promise.all([
   fetch(`${API_BASE}/api/bookmarks`, {
   credentials: "include"
@@ -28,12 +28,12 @@ Promise.all([
 .then(async ([bmRes, comicRes]) => {
   if (bmRes.status === 401) {
     throw new Error("LOGIN_REQUIRED");
-=======
+
 onAuthStateChanged(auth, async user => {
   if (!user){
     renderLoginGate();
     return;
->>>>>>> 4cf1a47f18f39b8b55676084a411c557a242619f
+
   }
 
   try {
