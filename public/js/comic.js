@@ -1,52 +1,76 @@
 import { API_BASE } from "./api.js";
 
 /* ================================
-   PARAM
+   AMBIL SLUG (ANTI NETLIFY BUG)
 ================================ */
-const parts = location.pathname.split("/").filter(Boolean);
-// /comic/:slug
-const slug = parts[1];
+// contoh URL:
+// /comic/sensei
+// /comic/sensei/
+// /comic/sensei/1  (ini gak kepake di comic detail)
+
+const slug = location.pathname
+  .replace(/\/$/, "")   // hapus trailing slash
+  .split("/")
+  .pop();               // ambil slug terakhir
 
 /* ================================
    ELEMENT
 ================================ */
-const coverImg = document.getElementById("coverImg");
-const title = document.getElementById("title");
-const genre = document.getElementById("genre");
-const synopsis = document.getElementById("synopsis");
-const chapters = document.getElementById("chapters");
+const coverImg   = document.getElementById("coverImg");
+const titleEl    = document.getElementById("title");
+const genreEl    = document.getElementById("genre");
+const synopsisEl = document.getElementById("synopsis");
+const chaptersEl = document.getElementById("chapters");
 const bookmarkBtn = document.getElementById("bookmarkBtn");
 
 /* ================================
-   LOAD COMIC
+   LOAD COMIC DATA
 ================================ */
-fetch(`${location.origin}/data/data.json`)
-  .then(r => r.json())
+fetch("/data/data.json", { cache: "no-store" })
+  .then(res => {
+    if (!res.ok) throw new Error("Gagal load data.json");
+    return res.json();
+  })
   .then(data => {
     const comic = data[slug];
+
     if (!comic) {
-      console.warn("Comic not found:", slug);
+      console.warn("Comic tidak ditemukan:", slug, data);
       return;
     }
 
+    // isi data
     coverImg.src = comic.cover;
-    title.textContent = comic.title;
-    genre.textContent = comic.genre;
-    synopsis.textContent = comic.synopsis;
+    titleEl.textContent = comic.title;
+    genreEl.textContent = comic.genre || "-";
+    synopsisEl.textContent = comic.synopsis || "";
 
     renderChapters(comic);
     setupBookmark();
+  })
+  .catch(err => {
+    console.error("ERROR LOAD COMIC:", err);
   });
 
 /* ================================
-   CHAPTER LIST
+   RENDER CHAPTER
 ================================ */
 function renderChapters(comic){
   const nums = Object.keys(comic.chapters || {})
     .map(Number)
-    .sort((a,b)=>b-a);
+    .filter(n => !isNaN(n))
+    .sort((a,b) => b - a);
 
-  chapters.innerHTML = nums.map(ch => `
+  if (!nums.length){
+    chaptersEl.innerHTML = `
+      <p style="opacity:.6;padding:12px">
+        Belum ada chapter
+      </p>
+    `;
+    return;
+  }
+
+  chaptersEl.innerHTML = nums.map(ch => `
     <div class="chapter" onclick="openChapter(${ch})">
       <div>Chapter ${ch}</div>
       <span>Read</span>
@@ -60,7 +84,7 @@ function openChapter(ch){
 window.openChapter = openChapter;
 
 /* ================================
-   BOOKMARK (SESSION BASED)
+   BOOKMARK (SESSION BACKEND)
 ================================ */
 function setupBookmark(){
   if (!bookmarkBtn) return;
@@ -75,7 +99,8 @@ function setupBookmark(){
   })
   .then(data => {
     if (data?.bookmarked) setBookmarked(true);
-  });
+  })
+  .catch(() => {});
 
   // toggle bookmark
   bookmarkBtn.onclick = () => {
