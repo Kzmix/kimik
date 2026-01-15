@@ -1,45 +1,42 @@
 import { API_BASE } from "./api.js";
 
 /* ================================
-   AMBIL SLUG (ANTI NETLIFY BUG)
+   SLUG FIX (NETLIFY SAFE)
 ================================ */
-// contoh URL:
-// /comic/sensei
-// /comic/sensei/
-// /comic/sensei/1  (ini gak kepake di comic detail)
+const path = location.pathname.replace(/\/$/, "");
+const segments = path.split("/");
 
-const slug = location.pathname
-  .replace(/\/$/, "")   // hapus trailing slash
-  .split("/")
-  .pop();               // ambil slug terakhir
+if (segments[1] !== "comic") {
+  console.error("Bukan halaman comic:", path);
+}
+
+const slug = segments[2];
 
 /* ================================
    ELEMENT
 ================================ */
-const coverImg   = document.getElementById("coverImg");
-const titleEl    = document.getElementById("title");
-const genreEl    = document.getElementById("genre");
+const coverImg = document.getElementById("coverImg");
+const titleEl = document.getElementById("title");
+const genreEl = document.getElementById("genre");
 const synopsisEl = document.getElementById("synopsis");
 const chaptersEl = document.getElementById("chapters");
 const bookmarkBtn = document.getElementById("bookmarkBtn");
 
 /* ================================
-   LOAD COMIC DATA
+   LOAD COMIC
 ================================ */
 fetch("/data/data.json", { cache: "no-store" })
-  .then(res => {
-    if (!res.ok) throw new Error("Gagal load data.json");
-    return res.json();
-  })
+  .then(r => r.json())
   .then(data => {
-    const comic = data[slug];
+    console.log("DATA JSON:", data);
+    console.log("SLUG:", slug);
 
+    const comic = data[slug];
     if (!comic) {
-      console.warn("Comic tidak ditemukan:", slug, data);
+      console.error("Comic tidak ditemukan:", slug);
       return;
     }
 
-    // isi data
     coverImg.src = comic.cover;
     titleEl.textContent = comic.title;
     genreEl.textContent = comic.genre || "-";
@@ -49,26 +46,16 @@ fetch("/data/data.json", { cache: "no-store" })
     setupBookmark();
   })
   .catch(err => {
-    console.error("ERROR LOAD COMIC:", err);
+    console.error("LOAD ERROR:", err);
   });
 
 /* ================================
-   RENDER CHAPTER
+   CHAPTER
 ================================ */
 function renderChapters(comic){
   const nums = Object.keys(comic.chapters || {})
     .map(Number)
-    .filter(n => !isNaN(n))
-    .sort((a,b) => b - a);
-
-  if (!nums.length){
-    chaptersEl.innerHTML = `
-      <p style="opacity:.6;padding:12px">
-        Belum ada chapter
-      </p>
-    `;
-    return;
-  }
+    .sort((a,b)=>b-a);
 
   chaptersEl.innerHTML = nums.map(ch => `
     <div class="chapter" onclick="openChapter(${ch})">
@@ -84,47 +71,27 @@ function openChapter(ch){
 window.openChapter = openChapter;
 
 /* ================================
-   BOOKMARK (SESSION BACKEND)
+   BOOKMARK
 ================================ */
 function setupBookmark(){
   if (!bookmarkBtn) return;
 
-  // cek status bookmark
   fetch(`${API_BASE}/api/bookmarks/${slug}`, {
     credentials: "include"
   })
-  .then(res => {
-    if (res.status === 401) return null;
-    return res.json();
-  })
-  .then(data => {
-    if (data?.bookmarked) setBookmarked(true);
-  })
-  .catch(() => {});
+  .then(r => r.status === 401 ? null : r.json())
+  .then(d => d?.bookmarked && setBookmarked(true));
 
-  // toggle bookmark
   bookmarkBtn.onclick = () => {
-    bookmarkBtn.disabled = true;
-
     fetch(`${API_BASE}/api/bookmarks/${slug}`, {
       method: "POST",
       credentials: "include"
     })
-    .then(res => {
-      if (res.status === 401) {
-        location.href =
-          `/login.html?redirect=${encodeURIComponent(location.pathname)}`;
-        return null;
-      }
-      return res.json();
-    })
-    .then(data => {
-      if (!data) return;
-      setBookmarked(data.bookmarked);
-    })
-    .finally(() => {
-      bookmarkBtn.disabled = false;
-    });
+    .then(r => r.status === 401
+      ? location.href = `/login.html?redirect=${encodeURIComponent(path)}`
+      : r.json()
+    )
+    .then(d => d && setBookmarked(d.bookmarked));
   };
 }
 
