@@ -1,3 +1,6 @@
-/comic/:slug/:chapter   /reader.html   200
-/comic/:slug            /comic.html    200
-/*                      /index.html    200
+/comic/*/*   /reader.html   200
+/comic/*     /comic.html    200
+
+/data/*      /data/:splat   200
+
+/*           /index.html    200
