@@ -1,3 +1,5 @@
+import { API_BASE } from "./api.js";
+
 let comics = {};
 
 const list = document.getElementById("list");
@@ -6,7 +8,9 @@ const list = document.getElementById("list");
    FETCH BOOKMARKS + COMICS
 ================================ */
 Promise.all([
-  fetch("/api/bookmarks", { credentials: "include" }),
+  fetch(`${API_BASE}/api/bookmarks`, {
+  credentials: "include"
+}),
   fetch("/data/data.json")
 ])
 .then(async ([bmRes, comicRes]) => {

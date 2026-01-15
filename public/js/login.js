@@ -1,3 +1,5 @@
+import { API_BASE } from "./api.js";
+
 const form = document.getElementById("loginForm");
 
 form.addEventListener("submit", e => {
@@ -6,12 +8,12 @@ form.addEventListener("submit", e => {
   const formData = new FormData(form);
   const data = Object.fromEntries(formData.entries());
 
-  fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(data)
-  })
+  fetch(`${API_BASE}/api/auth/login`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify(data)
+});
   .then(res => {
     if (!res.ok) throw new Error("Login gagal");
     return res.json();

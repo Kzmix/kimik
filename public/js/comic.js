@@ -1,3 +1,5 @@
+import { API_BASE } from "./api.js";
+
 /* ================================
    PARAM & ELEMENT
 ================================ */
@@ -70,9 +72,9 @@ function setupBookmark(){
   if (!bookmarkBtn) return;
 
   // cek status bookmark (WAJIB credentials)
-  fetch(`/api/bookmarks/${slug}`, {
-    credentials: "include"
-  })
+  fetch(`${API_BASE}/api/bookmarks/${slug}`, {
+  credentials: "include"
+})
   .then(res => {
     if (res.status === 401) return null;
     return res.json();
@@ -88,7 +90,7 @@ function setupBookmark(){
   bookmarkBtn.onclick = () => {
     bookmarkBtn.disabled = true;
 
-    fetch(`/api/bookmarks/${slug}`, {
+    fetch(`${API_BASE}/api/bookmarks/${slug}`, {
       method: "POST",
       credentials: "include"
     })

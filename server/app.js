@@ -7,6 +7,7 @@ import express from "express";
 import session from "express-session";
 import path from "path";
 import { fileURLToPath } from "url";
+import cors from "cors";
 
 import authRoutes from "./routes/auth.route.js";
 import bookmarkRoutes from "./routes/bookmark.route.js";
@@ -17,13 +18,25 @@ import bookmarkRoutes from "./routes/bookmark.route.js";
 const app = express();
 
 /* ================================
+   CORS (HARUS PALING ATAS)
+================================ */
+app.use(cors({
+  origin: [
+    "https://rexcom.netlify.app",
+    "https://controls-highlight-blake-picture.trycloudflare.com",
+    "http://localhost:5000"
+  ],
+  credentials: true
+}));
+
+/* ================================
    BASIC MIDDLEWARE
 ================================ */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* ================================
-   SESSION
+   SESSION (WAJIB BENAR)
 ================================ */
 if (!process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET is missing in .env");
@@ -34,54 +47,41 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  rolling: true,           // ⬅️ PENTING
+  rolling: true,
   cookie: {
     httpOnly: true,
-    sameSite: "lax",
-    maxAge: 1000 * 60 * 60 * 24 // 1 hari
+    sameSite: "none", // ⬅️ WAJIB
+    secure: true,     // ⬅️ WAJIB (HTTPS)
+    maxAge: 1000 * 60 * 60 * 24
   }
 }));
 
 /* ================================
-   STATIC FRONTEND (PALING PENTING)
+   STATIC FILE
 ================================ */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const PUBLIC_PATH = path.join(__dirname, "../public");
-/* ================================
-   STATIC FILE (HANYA ASSET)
-================================ */
-app.use(express.static(PUBLIC_PATH, {
-  index: false // ⬅️ PENTING
-}));
+
+app.use(express.static(PUBLIC_PATH, { index: false }));
 
 /* ================================
-   FRONTEND ROUTES (HTML)
+   FRONTEND ROUTES
 ================================ */
-
-// HOME
 app.get("/", (req, res) => {
   res.sendFile(path.join(PUBLIC_PATH, "index.html"));
 });
 
-// COMIC DETAIL
 app.get("/comic/:slug", (req, res) => {
   res.sendFile(path.join(PUBLIC_PATH, "comic.html"));
 });
 
-// READER CLEAN URL
 app.get("/comic/:slug/:chapter", (req, res) => {
   res.sendFile(path.join(PUBLIC_PATH, "reader.html"));
 });
 
-// reader
-app.get("/read/:slug/:chapter", (req, res) => {
-  res.sendFile(path.join(PUBLIC_PATH, "read.html"));
-});
-
 /* ================================
-   API ROUTES (HARUS DI BAWAH)
+   API ROUTES
 ================================ */
 app.use("/api/auth", authRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
